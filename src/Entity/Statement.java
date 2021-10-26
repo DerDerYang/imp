@@ -19,13 +19,16 @@ public class Statement {
     private String condition;
     private ArrayList<Statement> ifBody;
     private ArrayList<Statement> elseBody;
+    private ArrayList<Statement> whileBody;
 
 
     public Statement() {
         this.type = 0;
         this.seqBody = "";
+        this.condition = "";
         this.ifBody = new ArrayList<>();
         this.elseBody = new ArrayList<>();
+        this.whileBody = new ArrayList<>();
     }
 
     public ArrayList<Statement> parseStatement(final String input, ArrayList<Statement> statements) {
@@ -91,8 +94,6 @@ public class Statement {
             elseBody = matcher.group(3).trim();
             parseStatement(ifBody, sm.ifBody);
             parseStatement(elseBody, sm.elseBody);
-//               System.out.println(condition + ifBody + elseBody);
-
         } else {
             Pattern pattern = Pattern.compile("if(.*)then(.*)endif;");
             Matcher matcher = pattern.matcher(inputNew);
@@ -100,18 +101,27 @@ public class Statement {
             condition = matcher.group(1).trim();
             ifBody = matcher.group(2).trim();
             parseStatement(ifBody, sm.ifBody);
-
-
         }
         sm.type = 1;
         sm.condition = condition;
-
         return sm;
     }
 
 
     public Statement parseWhile(final String input) {
-        return new Statement();
+        String inputNew = input;
+        inputNew =  inputNew.replace("\n","");
+        Statement sm = new Statement();
+        String condition,body;
+        Pattern pattern = Pattern.compile("while(.*)do(.*)end");
+        Matcher matcher = pattern.matcher(inputNew);
+        matcher.find();
+        condition = matcher.group(1).trim();
+        body = matcher.group(2).trim();
+        sm.type = 2;
+        sm.condition = condition;
+        parseStatement(body,sm.whileBody);
+        return sm;
     }
 
     public Statement parseWait(final String input) {

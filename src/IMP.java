@@ -9,13 +9,14 @@ public class IMP {
 
 
     public static void main(String[] args) {
-        String test1 = "if b then\np0;\nelse p1;\n endif;";
-//while a<b do a=a+1;endwhile;a=2;b=0;
+        String test1 = "x=0;y=2;if x<y then\nwhile x<2 do\nx=x+1;endwhile;else\ny=y+1;endif;";
+
         ArrayList<Statement> statements = new ArrayList<>();
         Statement statement = new Statement();
-//        statements.add(statement);
         statements = statement.parseStatement(test1,statements);
-        System.out.println(statement);
-
+        System.out.println(statements);
+        for(int i = 0 ; i<statements.size();i++){
+            System.out.print(statements.get(i));
+        }
     }
 }
