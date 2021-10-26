@@ -1,0 +1,5 @@
+digraph G {
+	cjn->zjn;
+	njh->zjn;
+	zjn->lyy;
+}
