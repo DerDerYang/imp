@@ -39,22 +39,23 @@ public class Statement {
             Matcher matcher = pattern.matcher(input);
             if (!matcher.find()) {
                 t = input.length();
-                ArrayList<Statement> p = parseSequence(input.substring(s, t - s));
+                ArrayList<Statement> p = parseSequence(input.substring(s, t));
                 statements.addAll(p);
                 s = t;
             } else {
                 int position = matcher.start();
                 if (position > s)
-                    statements.addAll(parseSequence(input.substring(s, position - s)));
+                    statements.addAll(parseSequence(input.substring(s, position)));
                 s = position;
                 if (input.charAt(position) == 'i') {
                     t = input.indexOf("endif");
                     t += 6;
-                    statements.add(parseIf(input.substring(s, t - s)));
+                    String subs = input.substring(s, t);
+                    statements.add(parseIf(subs));
                 } else {
                     t = input.indexOf("endwhile");
                     t += 9;
-                    statements.add(parseWhile(input.substring(s, t - s)));
+                    statements.add(parseWhile(input.substring(s, t)));
                 }
                 s = t;
             }
@@ -124,7 +125,16 @@ public class Statement {
         return sm;
     }
 
+
     public Statement parseWait(final String input) {
-        return new Statement();
+        Statement sm = new Statement();
+        String condition;
+        Pattern pattern = Pattern.compile("wait\\((.*)\\)");
+        Matcher matcher = pattern.matcher(input);
+        matcher.find();
+        condition = matcher.group(1).trim();
+        sm.type = 3;
+        sm.condition = condition;
+        return sm;
     }
 }
