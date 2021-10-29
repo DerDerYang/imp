@@ -5,12 +5,31 @@ public class Variable {
     private String name;
     private int value;
 
-    public Variable() {
-        super();
+    public boolean isBoolean() {
+        return isBoolean;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public boolean equals(Variable v) {
+        return name.equals(v.name) && value == v.value;
+    }
+
+    public String toString(Boolean isPost) {
+        if ( !isPost )
+            return name+"="+value;
+        else
+            return name+"'="+value;
     }
 
     @Override
-    public String toString() {
-        return this.name + String.valueOf(value);
+    public String toString(){
+        return toString(false);
     }
 }
