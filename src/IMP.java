@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 public class IMP {
 
-
     public static void main(String[] args) {
         String input = "cobegin P0||P1 coend;P0:: t=0; while true do wait(t==0); t=1; endwhile; P1:: while true do wait(t==1); t=0; endwhile;";
         String input1 = "x=0;y=0;z=0;x=y+1;z=z+2;while y<2 do \nif x<y then \nx=x+1;else \ny=y+1;endif;endwhile;";
