@@ -1,6 +1,7 @@
 package Entity;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,11 +56,12 @@ public class FirstOrderLogical {
 
     public String valueToString() {
         StringBuilder tmp = new StringBuilder();
-        for (int v = 0; v <= vars.size(); v++) {
+        ArrayList<Variable> vars = this.getVars();
+        for (Variable var : vars) {
             if (tmp.length() > 0) {
                 tmp.append(",");
             }
-            tmp.append(vars.get(v).getName()).append("=").append(vars.get(v).getValue());
+            tmp.append(var.getName()).append("=").append(var.getValue());
         }
         return tmp.toString();
     }
@@ -111,7 +113,7 @@ public class FirstOrderLogical {
             return Integer.parseInt(tmp);
         }
         for (int v = 0; v <= vars.size(); v++) {
-            if (vars.get(v).getName().equals(tmp)) {
+            if (String.valueOf(vars.get(v).getName()).equals(tmp)) {
                 return vars.get(v).getValue();
             }
         }
@@ -175,7 +177,7 @@ public class FirstOrderLogical {
 
     }
 
-    public void outputFOL(ArrayList<Statement> statements) {
+    public ArrayList<ArrayList<FirstOrderLogical>> outputFOL(ArrayList<Statement> statements) {
         ArrayList<ArrayList<FirstOrderLogical>> lgss = new ArrayList<>();
         boolean hasPc = statements.size() > 1;
         for (int i = 0; i < statements.size(); ++i) {
@@ -191,13 +193,16 @@ public class FirstOrderLogical {
                     System.out.println(v.toString());
             }
         }
+        return lgss;
     }
 
     //重载函数，传入smss则用每个sms遍历
-    public void outputFOLs(ArrayList<ArrayList<Statement>> smss) {
+    public ArrayList<ArrayList<FirstOrderLogical>> outputFOLs(ArrayList<ArrayList<Statement>> smss) {
+        ArrayList<ArrayList<FirstOrderLogical>> res = new ArrayList<>();
         for (ArrayList<Statement> sms : smss) {
-            outputFOL(sms);
+            res.addAll(outputFOL(sms));
         }
+        return res;
     }
 
 
@@ -254,5 +259,80 @@ public class FirstOrderLogical {
             }
         }
         return list;
+    }
+
+    public static void nextVars(ArrayList<Variable> src, FirstOrderLogical dst) {
+        dst.vars.clear();
+        dst.vars = src;
+        Tuple<Character, Integer> pair = dst.assign();
+        if (pair.getX() != null)
+            Variable.changeValue(dst.vars, pair.getX(), pair.getY());
+    }
+
+    public static FirstOrderLogical nextStep(ArrayList<FirstOrderLogical> lgs, FirstOrderLogical cur) {
+        FirstOrderLogical lg = new FirstOrderLogical();
+        if (cur == null) {
+            lg.setPostLabel(lgs.get(0).getPreLabel());
+            nextVars(null, lg);
+            return lg;
+        }
+
+        for (FirstOrderLogical v : lgs) {
+            if (v.getPreLabel().equals(cur.getPostLabel())) {
+                nextVars(cur.vars, v);
+                if (v.isConditionOk())
+                    return v;
+            }
+        }
+        return lg;
+    }
+
+
+    public String getPreLabel() {
+        return preLabel;
+    }
+
+    public void setPreLabel(String preLabel) {
+        this.preLabel = preLabel;
+    }
+
+    public String getPostLabel() {
+        return postLabel;
+    }
+
+    public void setPostLabel(String postLabel) {
+        this.postLabel = postLabel;
+    }
+
+    public String getCondition() {
+        return condition;
+    }
+
+    public void setCondition(String condition) {
+        this.condition = condition;
+    }
+
+    public String getOpr() {
+        return opr;
+    }
+
+    public void setOpr(String opr) {
+        this.opr = opr;
+    }
+
+    public ArrayList<Variable> getVars() {
+        return vars;
+    }
+
+    public void setVars(ArrayList<Variable> vars) {
+        this.vars = vars;
+    }
+
+    public Integer getModValue() {
+        return ModValue;
+    }
+
+    public void setModValue(Integer modValue) {
+        ModValue = modValue;
     }
 }

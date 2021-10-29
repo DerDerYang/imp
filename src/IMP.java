@@ -1,7 +1,10 @@
 import Entity.FirstOrderLogical;
+import Entity.KripkeStructure;
 import Entity.Statement;
+import Entity.Variable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class IMP {
 
@@ -24,7 +27,12 @@ public class IMP {
         //一阶逻辑
         FirstOrderLogical f = new FirstOrderLogical();
         System.out.println("First order logical formula:");
-        f.outputFOLs(smss);
+        ArrayList<ArrayList<FirstOrderLogical>> lgss = f.outputFOLs(smss);
+
+        //转化KS
+        KripkeStructure.outputKS(lgss);
+
+
 
     }
 }
