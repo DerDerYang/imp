@@ -177,11 +177,11 @@ public class FirstOrderLogical {
 
     }
 
-    public ArrayList<ArrayList<FirstOrderLogical>> outputFOL(ArrayList<Statement> statements) {
+    public ArrayList<ArrayList<FirstOrderLogical>> outputFOL(ArrayList<ArrayList<Statement>> smss) {
         ArrayList<ArrayList<FirstOrderLogical>> lgss = new ArrayList<>();
-        boolean hasPc = statements.size() > 1;
-        for (int i = 0; i < statements.size(); ++i) {
-            ArrayList<FirstOrderLogical> formulas = new ArrayList<>(toFormula(statements, new Statement()));       //修改statements.get(i)->statements
+        boolean hasPc = smss.size() > 1;
+        for (int i = 0; i < smss.size(); ++i) {
+            ArrayList<FirstOrderLogical> formulas = new ArrayList<>(toFormula(smss.get(i), new Statement()));       //修改statements.get(i)->statements
             lgss.add(formulas);
             for (FirstOrderLogical v : formulas) {
                 if (hasPc) {
@@ -199,9 +199,10 @@ public class FirstOrderLogical {
     //重载函数，传入smss则用每个sms遍历
     public ArrayList<ArrayList<FirstOrderLogical>> outputFOLs(ArrayList<ArrayList<Statement>> smss) {
         ArrayList<ArrayList<FirstOrderLogical>> res = new ArrayList<>();
-        for (ArrayList<Statement> sms : smss) {
-            res.addAll(outputFOL(sms));
-        }
+//        for (ArrayList<Statement> sms : smss) {
+//            res.addAll(outputFOL(sms));
+//        }
+        res = outputFOL(smss);
         return res;
     }
 
