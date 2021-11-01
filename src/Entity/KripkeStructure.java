@@ -1,6 +1,7 @@
 package Entity;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 public class KripkeStructure {
@@ -76,7 +77,7 @@ public class KripkeStructure {
         return tmp.toString();
     }
 
-    public static void outputKS(ArrayList<ArrayList<FirstOrderLogical>> lgss){
+    public static ArrayList<HashMap<String, String>> outputKS(ArrayList<ArrayList<FirstOrderLogical>> lgss){
         ArrayList<String> pcs = new ArrayList<>();
         ArrayList<HashMap<String, String>> relations = new ArrayList<>();
         ArrayList<String> labels = new ArrayList<>();
@@ -92,6 +93,8 @@ public class KripkeStructure {
             }
             lastLgs.add(new FirstOrderLogical());
         }
+
+        //转化KS结构
         KripkeStructure.createKsLabels(lgss, pcs, relations, labels, lastLgs, vars, states, Rs);
 
         //输出所有S状态
@@ -106,6 +109,7 @@ public class KripkeStructure {
             if( !v.toString().isEmpty() )
                 System.out.println("R"+(index++)+":= "+v.toString());
         }
+        return relations;
     }
 
 
@@ -117,15 +121,19 @@ public class KripkeStructure {
     }
 
 
-    public static void createKsLabels(ArrayList<ArrayList<FirstOrderLogical>> lgss, final ArrayList<String> pcs,
+    public static void createKsLabels(ArrayList<ArrayList<FirstOrderLogical>> lgss, ArrayList<String> pcs,
                                ArrayList<HashMap<String, String>> relations, ArrayList<String> labels,
                                ArrayList<FirstOrderLogical> lastLgs, final ArrayList<Variable> vars,
                                ArrayList<String> states, ArrayList<KripkeStructure> Rs, int deep) {
         ++deep;
+        ArrayList<String> temp = pcs;
+        ArrayList<FirstOrderLogical> lastLgsTmp = lastLgs;
+        //如果一阶逻辑有n段，则pcs有n个'U'组成，如果只有一段，则pcs=""
+
         for (int i = 0; i < pcs.size(); ++i) {
             //用户执行完之后恢复
             KripkeStructure oneRs = new KripkeStructure();
-            String oldLabel = String.join(" ", pcs);
+            String oldLabel = String.join(" ", temp);
             oneRs.setPreLabel(oldLabel);
 
             //只包含空格，则认为是空
@@ -135,10 +143,10 @@ public class KripkeStructure {
                 oldLabel = "";
 
             //执行完要恢复到上一步的状态
-            lastLgs.get(i).setVars(vars);
-            FirstOrderLogical lastLg = lastLgs.get(i);
-            String lastArgsStr = lastLgs.get(i).valueToString();
-            oneRs.preVars = lastLgs.get(i).getVars();
+            lastLgsTmp.get(i).setVars(vars);
+            FirstOrderLogical lastLg = lastLgsTmp.get(i);
+            String lastArgsStr = lastLgsTmp.get(i).valueToString();
+            oneRs.setPreVars(lastLgsTmp.get(i).getVars());
             if (!oldLabel.isEmpty() && !lastArgsStr.isEmpty())
                 oldLabel += ',' + lastArgsStr;
 
@@ -146,50 +154,48 @@ public class KripkeStructure {
 //                int a = 10;
 //            }
 
-            lastLgs.set(i, FirstOrderLogical.nextStep(lgss.get(i), lastLgs.get(i)));
+            lastLgsTmp.set(i, FirstOrderLogical.nextStep(lgss.get(i), lastLgsTmp.get(i)));
 
-            pcs.set(i, lastLgs.get(i).getPostLabel());
-            ArrayList<Variable> newVars = lastLgs.get(i).getVars();
-            String newLabel = String.join(" ", pcs);
+            temp.set(i, lastLgsTmp.get(i).getPostLabel());
+            ArrayList<Variable> newVars = lastLgsTmp.get(i).getVars();
+            String newLabel = String.join(" ", temp);
 
             //收集R变换
-            oneRs.postLabel = newLabel;
-            oneRs.postVars = lastLgs.get(i).getVars();
-            oneRs.opr = lastLgs.get(i).getOpr();
+            oneRs.setPostLabel(newLabel);
+            oneRs.setPostVars(lastLgsTmp.get(i).getVars());
+            oneRs.setOpr(lastLgsTmp.get(i).getOpr());
             Rs.add(oneRs);
 
             //收集状态S
-            String oneState = lastLgs.get(i).valueToString();
+            String oneState = lastLgsTmp.get(i).valueToString();
             if (!oneState.isEmpty() && !states.contains(oneState)) {
                 states.add(oneState);
             }
 
-            if (!newLabel.isEmpty() && !lastLgs.get(i).valueToString().isEmpty())
-                newLabel += ',' + lastLgs.get(i).valueToString();
+            if (!newLabel.isEmpty() && !lastLgsTmp.get(i).valueToString().isEmpty())
+                newLabel += ',' + lastLgsTmp.get(i).valueToString();
 
             HashMap<String, String> r = new HashMap<>();
             r.put(oldLabel, newLabel);
             if (relations.contains(r)) {
-                pcs.set(i, pcs.get(i));
-                lastLgs.set(i, lastLg);
+                temp.set(i, pcs.get(i));
+                lastLgsTmp.set(i, lastLg);
                 continue;
             }
-
             if (!oldLabel.isEmpty() && !newLabel.isEmpty()) {
-                HashMap<String, String> temp = new HashMap<>();
-                temp.put(oldLabel, newLabel);
-                relations.add(temp);
+                HashMap<String, String> temp1 = new HashMap<>();
+                temp1.put(oldLabel, newLabel);
+                relations.add(temp1);
             }
             if (!labels.contains(oldLabel) && !oldLabel.isEmpty()) {
                 labels.add(oldLabel);
             }
-
             if (!labels.contains(newLabel) && !newLabel.isEmpty()) {
                 labels.add(newLabel);
             }
-            createKsLabels(lgss, pcs, relations, labels, lastLgs, newVars, states, Rs, deep);
-            pcs.set(i, pcs.get(i));
-            lastLgs.set(i, lastLg);
+            createKsLabels(lgss, temp, relations, labels, lastLgsTmp, newVars, states, Rs, deep);
+            temp.set(i, pcs.get(i));
+            lastLgsTmp.set(i, lastLg);
         }
     }
 

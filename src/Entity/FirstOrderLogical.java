@@ -39,6 +39,10 @@ public class FirstOrderLogical {
         }
     }
 
+    public boolean isNull() {
+        return this.getPreLabel().isEmpty() && this.getPostLabel().isEmpty();
+    }
+
     public String toString() {
         if (!condition.isEmpty()) {
             return "pc=" + preLabel + " and pc'=" + postLabel + " and (" + condition + ") and SAME(V)";
@@ -92,8 +96,8 @@ public class FirstOrderLogical {
 
         }
         Pattern has_pattern = Pattern.compile("(\\w*)\\s*=\\s*(\\d*)");
-        Matcher has_matcher = has_pattern.matcher(opr);
-        if (matcher.find()) {
+        Matcher has_matcher = has_pattern.matcher(this.getOpr());
+        if (has_matcher.find()) {
             return new Tuple<>(has_matcher.group(1).charAt(0), Integer.valueOf(has_matcher.group(2)));
         }
         return new Tuple<>();
@@ -112,9 +116,9 @@ public class FirstOrderLogical {
         if (Character.isDigit(var)) {
             return Integer.parseInt(tmp);
         }
-        for (int v = 0; v <= vars.size(); v++) {
-            if (String.valueOf(vars.get(v).getName()).equals(tmp)) {
-                return vars.get(v).getValue();
+        for (Variable v : vars) {
+            if (String.valueOf(v.getName()).equals(tmp)) {
+                return v.getValue();
             }
         }
         return 0;
@@ -272,15 +276,15 @@ public class FirstOrderLogical {
 
     public static FirstOrderLogical nextStep(ArrayList<FirstOrderLogical> lgs, FirstOrderLogical cur) {
         FirstOrderLogical lg = new FirstOrderLogical();
-        if (cur == null) {
+        if (cur.isNull()) {
             lg.setPostLabel(lgs.get(0).getPreLabel());
-            nextVars(null, lg);
+            nextVars(cur.getVars(), lg);
             return lg;
         }
 
         for (FirstOrderLogical v : lgs) {
             if (v.getPreLabel().equals(cur.getPostLabel())) {
-                nextVars(cur.vars, v);
+                nextVars(cur.getVars(), v);
                 if (v.isConditionOk())
                     return v;
             }

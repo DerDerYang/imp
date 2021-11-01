@@ -34,6 +34,10 @@ public class Statement {
         this.vars = new ArrayList<Variable>();
     }
 
+    public boolean isNull() {
+        return this.getCondition().isEmpty() && this.getSeqBody().isEmpty();
+    }
+
     public void reversedCondition() {
         if (condition.contains("not")) {
             condition = condition.replace("not", "");
@@ -43,25 +47,26 @@ public class Statement {
         }
     }
 
-    void labelStatements(final char prefix, Integer index, ArrayList<Statement> sms) {
+    int labelStatements(final char prefix, int index, ArrayList<Statement> sms) {
         if (sms.isEmpty()) {
-            return;
+            return index;
         }
         for (Statement s : sms) {
-            s.label = prefix + String.valueOf(index);
+            s.label = prefix + String.valueOf(index++);
             if (s.type == 1) {
-                labelStatements(prefix, index, s.ifBody);
-                labelStatements(prefix, index, s.elseBody);
+                index = labelStatements(prefix, index, s.ifBody);
+                index = labelStatements(prefix, index, s.elseBody);
             } else if (s.type == 2) {
-                labelStatements(prefix, index, s.whileBody);
+                index = labelStatements(prefix, index, s.whileBody);
             }
         }
+        return index;
     }
 
     public void labelStatements(ArrayList<ArrayList<Statement>> smss) {
         char prefix = 'A';
         for (ArrayList<Statement> sms : smss) {
-            int index = 0;
+            Integer index = 0;
             labelStatements(prefix, index, sms);
             prefix++;
         }

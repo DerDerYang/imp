@@ -1,0 +1,52 @@
+digraph G {
+	A1[label="A1 U t=0"];
+	A2[label="A2 U t=0"];
+	A3[label="A3 U t=0"];
+	U ;
+	A0[label="A0 U"];
+	U ->A0
+	A0->A1
+	A1->A2
+	A2->A3
+	A3->A1
+	A1->A2
+	A2->A3
+	A3->A1
+	A2->A2
+	A2->A2
+	A2->A3
+	A3->A1
+	A1->A2
+	A3->A3
+	A3->A3
+	A3->A1
+	A1->A2
+	A2->A3
+	A1->A1
+	A1->A1
+	A1->A2
+	A2->A3
+	A3->A1
+	A2->A2
+	A2->A2
+	A3->A3
+	A3->A1
+	A2->A2
+	A2->A2
+	A3->A3
+	A3->A2
+	A3->A3
+	A3->A3
+	A1->A1
+	A1->A1
+	A2->A2
+	A3->A3
+	A1->A1
+	A1->A3
+	A1->A1
+	A1->A3
+	A1->A1
+	A1->A1
+	A1->A1
+	A1->A2
+}
